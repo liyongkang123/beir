@@ -22,8 +22,9 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'sentence-transformers',
-        'pytrec_eval',
-        'faiss_cpu',
+        # 'pytrec_eval',
+        'pytrec-eval-terrier',
+        # 'faiss_cpu',
         'elasticsearch==7.9.1',
         'datasets'
     ],
