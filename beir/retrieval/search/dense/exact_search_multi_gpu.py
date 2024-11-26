@@ -22,14 +22,16 @@ import importlib.util
 
 ### HuggingFace Evaluate library (pip install evaluate) only available with Python >= 3.7.
 ### Hence for no import issues with Python 3.6, we move DummyMetric if ``evaluate`` library is found.
+
 if importlib.util.find_spec("evaluate") is not None:
-    from evaluate.module import EvaluationModule, EvaluationModuleInfo
+    # from evaluate.module import EvaluationModule, EvaluationModuleInfo
+    import evaluate
     
-    class DummyMetric(EvaluationModule):
+    class DummyMetric(evaluate.module.EvaluationModule):
         len_queries = None
         
         def _info(self):
-            return EvaluationModuleInfo(
+            return evaluate.module.EvaluationModuleInfo(
                 description="dummy metric to handle storing middle results",
                 citation="",
                 features=Features(
