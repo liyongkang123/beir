@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import glob
 import logging
+ 
 
 import pytrec_eval
 
-from .custom_metrics import hole, mrr, recall_cap, top_k_accuracy
+from .custom_metrics_yk import hole, mrr, recall_cap, top_k_accuracy
 from .search.base import BaseSearch
 
 logger = logging.getLogger(__name__)
@@ -71,6 +72,7 @@ class EvaluateRetrieval:
         results: dict[str, dict[str, float]],
         k_values: list[int],
         ignore_identical_ids: bool = True,
+        return_scores: bool = False,
     ) -> tuple[dict[str, float], dict[str, float], dict[str, float], dict[str, float]]:
 
         # 选择只在 qrels 中的 results
@@ -122,7 +124,15 @@ class EvaluateRetrieval:
             for k in eval.keys():
                 logger.info(f"{k}: {eval[k]:.4f}")
 
-        return ndcg, _map, recall, precision
+
+        if return_scores:
+            return ndcg, _map, recall, precision, scores
+        else:
+            return ndcg, _map, recall, precision
+
+
+
+
 
     @staticmethod
     def evaluate_custom(
@@ -130,12 +140,13 @@ class EvaluateRetrieval:
         results: dict[str, dict[str, float]],
         k_values: list[int],
         metric: str,
+        return_scores: bool = False,
     ) -> tuple[dict[str, float]]:
         # 选择只在 qrels 中的 results
         results = {qid: results[qid]  for qid in qrels}
 
         if metric.lower() in ["mrr", "mrr@k", "mrr_cut"]:
-            return mrr(qrels, results, k_values)
+            return mrr(qrels, results, k_values, return_scores=return_scores)
 
         elif metric.lower() in ["recall_cap", "r_cap", "r_cap@k"]:
             return recall_cap(qrels, results, k_values)
