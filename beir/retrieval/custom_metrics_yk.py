@@ -1,14 +1,36 @@
 from __future__ import annotations
-
+from typing import overload, Literal, Union
 import logging
 
+# --- 使用 @overload 定义不同的函数签名 ---
 
+# 签名 1: 当 return_scores 是 True 时
+@overload
+def mrr(
+    qrels: dict[str, dict[str, int]],
+    results: dict[str, dict[str, float]],
+    k_values: list[int],
+    return_scores: Literal[True],
+) -> tuple[dict[str, float], dict[str, dict[str, float]]]: ...
+
+# 签名 2: 当 return_scores 是 False (或未提供) 时
+@overload
+def mrr(
+    qrels: dict[str, dict[str, int]],
+    results: dict[str, dict[str, float]],
+    k_values: list[int],
+    return_scores: Literal[False] = False,
+) -> dict[str, float]: ...
+
+
+# --- 函数的实际实现 ---
+# 实现的类型注解使用 Union，因为它必须能处理所有可能的情况
 def mrr(
     qrels: dict[str, dict[str, int]],
     results: dict[str, dict[str, float]],
     k_values: list[int],
     return_scores: bool = False,
-) -> tuple[dict[str, float]]:
+) -> Union[dict[str, float], tuple[dict[str, float], dict[str, dict[str, float]]]]:
     MRR = {}
 
     per_query_scores = {}
@@ -52,7 +74,7 @@ def recall_cap(
     qrels: dict[str, dict[str, int]],
     results: dict[str, dict[str, float]],
     k_values: list[int],
-) -> tuple[dict[str, float]]:
+) -> dict[str, float]:
     capped_recall = {}
 
     for k in k_values:
@@ -80,7 +102,7 @@ def hole(
     qrels: dict[str, dict[str, int]],
     results: dict[str, dict[str, float]],
     k_values: list[int],
-) -> tuple[dict[str, float]]:
+) -> dict[str, float]:
     Hole = {}
 
     for k in k_values:
@@ -111,7 +133,7 @@ def top_k_accuracy(
     qrels: dict[str, dict[str, int]],
     results: dict[str, dict[str, float]],
     k_values: list[int],
-) -> tuple[dict[str, float]]:
+) -> dict[str, float]:
     top_k_acc = {}
 
     for k in k_values:
